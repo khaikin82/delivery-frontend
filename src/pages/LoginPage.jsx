@@ -16,7 +16,8 @@ function LoginPage() {
     setError(null);
 
     try {
-      const user = await authAPI.login(username, password);
+      const loginRequest = { username, password };
+      const user = await authAPI.login(loginRequest);
 
       if (!user) {
         setError("Login failed: user data missing");
@@ -51,7 +52,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-start min-h-screen bg-gray-100 pt-35">
       <form
         onSubmit={handleLogin}
         className="bg-white p-8 rounded shadow-md w-96"

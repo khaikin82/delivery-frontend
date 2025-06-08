@@ -1,10 +1,13 @@
-import axiosClient from "./apiClient.js";
+// src/api/userApi.js
+import apiClient from "./apiClient";
+
+const createOrder = (orderData) => {
+  const url = "/v1/orders";
+  return apiClient.post(url, orderData);
+};
 
 const userAPI = {
-  getAllFlights: (flights) => {
-    const url = "api/v1/flights";
-    return axiosClient.get(url, flights);
-  },
+  createOrder,
 };
 
 export default userAPI;

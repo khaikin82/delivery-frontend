@@ -26,13 +26,14 @@ function RegisterPage() {
 
     setLoading(true);
     try {
+      console.log(role);
       const roleUpperCase = role.toUpperCase();
       const registerRequest = {
         username,
         password,
         fullName,
         email,
-        roleUpperCase,
+        role: roleUpperCase,
       };
       const newJwtToken = await authAPI.register(registerRequest);
       console.log(newJwtToken);
