@@ -44,7 +44,7 @@ function CustomerDashboard() {
       {/* Tabs */}
       <div className="flex space-x-4 mb-6">
         <button
-          className={`px-4 py-2 rounded ${
+          className={`px-4 py-2 rounded cursor-pointer ${
             tab === "create"
               ? "bg-green-600 text-white"
               : "bg-gray-200 text-gray-800"
@@ -54,7 +54,7 @@ function CustomerDashboard() {
           Tạo đơn hàng
         </button>
         <button
-          className={`px-4 py-2 rounded ${
+          className={`px-4 py-2 rounded cursor-pointer ${
             tab === "myOrders"
               ? "bg-green-600 text-white"
               : "bg-gray-200 text-gray-800"

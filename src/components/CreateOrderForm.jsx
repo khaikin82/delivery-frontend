@@ -260,7 +260,7 @@ const CreateOrderForm = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 rounded text-white font-semibold transition ${
+            className={`w-full py-3 rounded text-white font-semibold transition cursor-pointer ${
               loading
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-green-600 hover:bg-green-700"

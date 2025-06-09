@@ -135,7 +135,7 @@ function RegisterPage() {
           >
             <option value="customer">Customer</option>
             <option value="admin">Admin</option>
-            <option value="delivery">Delivery Staff</option>
+            <option value="delivery_staff">Delivery Staff</option>
           </select>
         </div>
 

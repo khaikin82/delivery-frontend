@@ -34,7 +34,8 @@ function OrderDetailModal({ order }) {
         <strong>Trạng thái:</strong> {order.status}
       </p>
       <p>
-        <strong>Ngày tạo:</strong> {new Date(order.createdAt).toLocaleString()}
+        <strong>Ngày tạo:</strong>{" "}
+        {new Date(order.createdAt).toLocaleString("vi-VN")}
       </p>
       <p>
         <strong>Người tạo:</strong> {order.customerUsername}
@@ -50,8 +51,8 @@ function OrderDetailModal({ order }) {
         <ul className="list-disc ml-5 mt-1">
           {order.trackingHistory.map((item, index) => (
             <li key={index}>
-              {item.status} - {new Date(item.changedAt).toLocaleString()} bởi{" "}
-              {item.changedBy}
+              {item.status} - {new Date(item.changedAt).toLocaleString("vi-VN")}{" "}
+              bởi {item.changedBy}
             </li>
           ))}
         </ul>

@@ -92,13 +92,13 @@ function MyOrders({ orders, loading, onReload, onSelectOrder }) {
       {/* Nút thao tác */}
       <div className="flex justify-end space-x-2 mb-4">
         <button
-          className="px-4 py-2 bg-blue-600 text-white rounded"
+          className="px-4 py-2 bg-blue-600 text-white rounded cursor-pointer"
           onClick={onReload}
         >
           Làm mới dữ liệu
         </button>
         <button
-          className="px-4 py-2 bg-gray-300 text-gray-800 rounded"
+          className="px-4 py-2 bg-gray-300 text-gray-800 rounded cursor-pointer"
           onClick={handleResetFilters}
         >
           Đặt lại bộ lọc

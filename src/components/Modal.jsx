@@ -4,7 +4,7 @@ function Modal({ visible, message, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50 z-50"
+      className="fixed inset-0 flex items-center justify-center bg-gray-300/50 transition-opacity bg-opacity-50 z-50"
       onClick={onClose} // Click ngoài popup cũng đóng
     >
       <div
