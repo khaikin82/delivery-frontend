@@ -4,50 +4,36 @@ import AdminOrdersTable from "../components/AdminOrdersTable";
 import AdminStaffTable from "../components/AdminStaffTable";
 import AssignStaffModal from "../components/AssignStaffModal";
 import OrderDetailModal from "../components/OrderDetailModal";
+import Pagination from "../components/Pagination";
 import Modal from "../components/Modal";
+import usePaginatedData from "../hooks/usePaginatedData";
 
 function AdminDashboard() {
-  const [selectedTab, setSelectedTab] = useState("orders"); // NEW state tab
-  const [orders, setOrders] = useState([]);
-  const [staffList, setStaffList] = useState([]); // NEW state staff list
-  const [loading, setLoading] = useState(false);
+  const pageSize = 10;
+
+  const [selectedTab, setSelectedTab] = useState("orders");
+  const {
+    data: orders,
+    page: orderPage,
+    setPage: setOrderPage,
+    totalPages: orderTotalPages,
+    loading: loadingOrders,
+    refetch: fetchOrders,
+  } = usePaginatedData(adminAPI.getOrders, [selectedTab === "orders"]);
+
+  const {
+    data: staffList,
+    page: staffPage,
+    setPage: setStaffPage,
+    totalPages: staffTotalPages,
+    loading: loadingStaff,
+    refetch: fetchStaff,
+  } = usePaginatedData(adminAPI.getDeliveryStaff, [selectedTab === "staff"]);
+
+  // Modals & selected order state
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [assignModalVisible, setAssignModalVisible] = useState(false);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
-
-  const fetchOrders = async () => {
-    setLoading(true);
-    try {
-      const data = await adminAPI.getOrders();
-      console.log(1);
-      setOrders(data);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchStaff = async () => {
-    setLoading(true);
-    try {
-      const data = await adminAPI.getDeliveryStaff();
-      console.log(2);
-      setStaffList(data);
-    } catch (error) {
-      console.error("Error fetching staff:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (selectedTab === "orders") {
-      fetchOrders();
-    } else if (selectedTab === "staff") {
-      fetchStaff();
-    }
-  }, [selectedTab]);
 
   const handleAssignClick = (order) => {
     setSelectedOrder(order);
@@ -83,39 +69,50 @@ function AdminDashboard() {
 
       {/* Tab buttons */}
       <div className="mb-6 flex space-x-4">
-        <button
-          onClick={() => setSelectedTab("orders")}
-          className={`px-4 py-2 rounded ${
-            selectedTab === "orders"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-black"
-          }`}
-        >
-          Đơn hàng
-        </button>
-        <button
-          onClick={() => setSelectedTab("staff")}
-          className={`px-4 py-2 rounded cursor-pointer ${
-            selectedTab === "staff"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-black"
-          }`}
-        >
-          Nhân viên
-        </button>
+        {["orders", "staff"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setSelectedTab(tab)}
+            className={`px-4 py-2 rounded ${
+              selectedTab === tab
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-black"
+            }`}
+          >
+            {tab === "orders" ? "Đơn hàng" : "Nhân viên"}
+          </button>
+        ))}
       </div>
 
       {/* Tab content */}
-      {loading ? (
-        <p>Đang tải dữ liệu...</p>
-      ) : selectedTab === "orders" ? (
-        <AdminOrdersTable
-          orders={orders}
-          onSelectOrder={handleViewDetailClick}
-          onAssignOrder={handleAssignClick}
-        />
+      {selectedTab === "orders" ? (
+        <>
+          <AdminOrdersTable
+            orders={orders}
+            onSelectOrder={handleViewDetailClick}
+            onAssignOrder={handleAssignClick}
+            currentPage={orderPage}
+            pageSize={pageSize}
+          />
+          <Pagination
+            currentPage={orderPage}
+            totalPages={orderTotalPages}
+            onPageChange={setOrderPage}
+          />
+        </>
       ) : (
-        <AdminStaffTable staffList={staffList} />
+        <>
+          <AdminStaffTable
+            staffList={staffList}
+            currentPage={staffPage}
+            pageSize={pageSize}
+          />
+          <Pagination
+            currentPage={staffPage}
+            totalPages={staffTotalPages}
+            onPageChange={setStaffPage}
+          />
+        </>
       )}
 
       {assignModalVisible && (

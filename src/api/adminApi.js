@@ -1,15 +1,15 @@
 // src/api/adminApi.js
 import apiClient from "./apiClient";
 
-// Lấy danh sách tất cả đơn hàng
-const getOrders = () => {
-  const url = "/v1/orders";
+// Lấy danh sách tất cả đơn hàng có phân trang
+const getOrders = (page = 0, size = 10) => {
+  const url = `/v1/orders?page=${page}&size=${size}`;
   return apiClient.get(url);
 };
 
-// Lấy danh sách nhân viên giao hàng
-const getDeliveryStaff = () => {
-  const url = "/v1/users/delivery-staff";
+// Lấy danh sách nhân viên giao hàng có phân trang
+const getDeliveryStaff = (page = 0, size = 10) => {
+  const url = `/v1/users/delivery-staff?page=${page}&size=${size}`;
   return apiClient.get(url);
 };
 

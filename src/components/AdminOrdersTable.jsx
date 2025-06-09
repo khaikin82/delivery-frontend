@@ -11,7 +11,13 @@ const ORDER_STATUS_OPTIONS = [
   "CANCELLED",
 ];
 
-function AdminOrdersTable({ orders, onSelectOrder, onAssignOrder }) {
+function AdminOrdersTable({
+  orders,
+  onSelectOrder,
+  onAssignOrder,
+  currentPage,
+  pageSize,
+}) {
   const [statusFilter, setStatusFilter] = useState("");
   const [hasDeliveryStaffFilter, setHasDeliveryStaffFilter] = useState("");
   const [dateFrom, setDateFrom] = useState("");
@@ -108,72 +114,79 @@ function AdminOrdersTable({ orders, onSelectOrder, onAssignOrder }) {
       </div>
 
       {/* Bảng đơn hàng */}
-      <table className="w-full border-collapse border border-gray-300 text-sm">
-        <thead>
-          <tr className="bg-blue-300">
-            <th className="border px-2 py-1">Mã đơn</th>
-            <th className="border px-2 py-1">Người nhận</th>
-            <th className="border px-2 py-1">Địa chỉ giao</th>
-            <th className="border px-2 py-1">Địa chỉ lấy</th>
-            <th className="border px-2 py-1">Mô tả</th>
-            <th className="border px-2 py-1">Trạng thái</th>
-            <th className="border px-2 py-1">Người giao</th>
-            <th className="border px-2 py-1">Ngày tạo</th>
-            <th className="border px-2 py-1">Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredOrders.length === 0 ? (
-            <tr>
-              <td
-                colSpan={9}
-                className="border px-2 py-1 text-center text-gray-500"
-              >
-                Không tìm thấy đơn hàng nào phù hợp.
-              </td>
+      <div className="relative">
+        <table className="w-full border-collapse border border-gray-300 text-sm">
+          <thead>
+            <tr className="bg-blue-300">
+              <th className="border px-2 py-1">STT</th>
+              <th className="border px-2 py-1">Mã đơn</th>
+              <th className="border px-2 py-1">Người nhận</th>
+              <th className="border px-2 py-1">Địa chỉ giao</th>
+              <th className="border px-2 py-1">Địa chỉ lấy</th>
+              <th className="border px-2 py-1">Mô tả</th>
+              <th className="border px-2 py-1">Trạng thái</th>
+              <th className="border px-2 py-1">Người giao</th>
+              <th className="border px-2 py-1">Ngày tạo</th>
+              <th className="border px-2 py-1">Hành động</th>
             </tr>
-          ) : (
-            filteredOrders.map((order, index) => {
-              const rowClass = index % 2 === 0 ? "bg-white" : "bg-blue-50";
+          </thead>
+          <tbody>
+            {filteredOrders.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={10}
+                  className="border px-2 py-4 text-center text-gray-500"
+                >
+                  Không tìm thấy đơn hàng nào phù hợp.
+                </td>
+              </tr>
+            ) : (
+              filteredOrders.map((order, index) => {
+                const rowClass = index % 2 === 0 ? "bg-white" : "bg-blue-50";
+                const stt = currentPage * pageSize + index + 1;
 
-              return (
-                <tr key={order.orderCode} className={`${rowClass}`}>
-                  <td className="border px-2 py-1">{order.orderCode}</td>
-                  <td className="border px-2 py-1">{order.receiverName}</td>
-                  <td className="border px-2 py-1">{order.receiverAddress}</td>
-                  <td className="border px-2 py-1">{order.pickupAddress}</td>
-                  <td className="border px-2 py-1">{order.description}</td>
-                  <td className="border px-2 py-1">{order.status}</td>
-                  <td className="border px-2 py-1">
-                    {order.deliveryStaffUsername || "Chưa giao"}
-                  </td>
-                  <td className="border px-2 py-1">
-                    {new Date(order.createdAt).toLocaleDateString("vi-VN", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    })}
-                  </td>
-                  <td className="border px-2 py-1 text-center space-x-2">
-                    <button
-                      className="text-blue-600 underline hover:text-blue-900 cursor-pointer"
-                      onClick={() => onSelectOrder(order)}
-                    >
-                      Xem chi tiết
-                    </button>
-                    <button
-                      className="text-green-600 underline hover:text-green-900 cursor-pointer"
-                      onClick={() => onAssignOrder(order)}
-                    >
-                      Giao đơn
-                    </button>
-                  </td>
-                </tr>
-              );
-            })
-          )}
-        </tbody>
-      </table>
+                return (
+                  <tr key={order.orderCode} className={`${rowClass}`}>
+                    <td className="border px-2 py-1">{stt}</td>
+                    <td className="border px-2 py-1">{order.orderCode}</td>
+                    <td className="border px-2 py-1">{order.receiverName}</td>
+                    <td className="border px-2 py-1">
+                      {order.receiverAddress}
+                    </td>
+                    <td className="border px-2 py-1">{order.pickupAddress}</td>
+                    <td className="border px-2 py-1">{order.description}</td>
+                    <td className="border px-2 py-1">{order.status}</td>
+                    <td className="border px-2 py-1">
+                      {order.deliveryStaffUsername || "Chưa giao"}
+                    </td>
+                    <td className="border px-2 py-1">
+                      {new Date(order.createdAt).toLocaleDateString("vi-VN", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}
+                    </td>
+                    <td className="border px-2 py-1 text-center space-x-2">
+                      <button
+                        className="text-blue-600 underline hover:text-blue-900 cursor-pointer"
+                        onClick={() => onSelectOrder(order)}
+                      >
+                        Xem chi tiết
+                      </button>
+                      <button
+                        className="text-green-600 underline hover:text-green-900 cursor-pointer"
+                        onClick={() => onAssignOrder(order)}
+                      >
+                        Giao đơn
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
