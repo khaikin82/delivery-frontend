@@ -17,7 +17,6 @@ const STATUS_FLOW = [
 
 function DeliveryStaffDashboard() {
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [updatingOrderId, setUpdatingOrderId] = useState(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
@@ -29,7 +28,6 @@ function DeliveryStaffDashboard() {
   const pageSize = 10;
 
   const fetchOrders = async () => {
-    setLoading(true);
     try {
       const res = await deliveryStaffAPI.getMyStaffOrders(page, pageSize);
       setOrders(res.content || []);
@@ -37,8 +35,6 @@ function DeliveryStaffDashboard() {
       setError(null);
     } catch (err) {
       setError("Lấy đơn hàng thất bại.");
-    } finally {
-      setLoading(false);
     }
   };
 
