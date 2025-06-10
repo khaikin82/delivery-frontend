@@ -8,7 +8,7 @@ const getOrders = (page = 0, size = 10) => {
 };
 
 // Lấy danh sách nhân viên giao hàng có phân trang
-const getDeliveryStaff = (page = 0, size = 10) => {
+const getDeliveryStaff = (page = 0, size = 5) => {
   const url = `/v1/users/delivery-staff?page=${page}&size=${size}`;
   return apiClient.get(url);
 };

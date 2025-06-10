@@ -1,8 +1,8 @@
 // src/api/deliveryStaffApi.js
 import apiClient from "./apiClient";
 
-const getMyStaffOrders = () => {
-  const url = "/v1/orders/staff/my";
+const getMyStaffOrders = (page = 0, size = 10) => {
+  const url = `/v1/orders/staff/my?page=${page}&size=${size}`;
   return apiClient.get(url);
 };
 

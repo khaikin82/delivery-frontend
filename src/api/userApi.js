@@ -6,8 +6,8 @@ const createOrder = (orderData) => {
   return apiClient.post(url, orderData);
 };
 
-const getMyOrders = () => {
-  const url = "v1/orders/my";
+const getMyOrders = (page = 0, size = 10) => {
+  const url = `/v1/orders/my?page=${page}&size=${size}`;
   return apiClient.get(url);
 };
 

@@ -3,6 +3,7 @@ import deliveryStaffAPI from "../api/deliveryStaffApi";
 import Modal from "../components/Modal";
 import OrderDetailModal from "../components/OrderDetailModal";
 import StaffOrdersTable from "../components/StaffOrdersTable";
+import Pagination from "../components/Pagination";
 
 const STATUS_FLOW = [
   "CREATED",
@@ -22,11 +23,17 @@ function DeliveryStaffDashboard() {
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
+  // Pagination state
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 10;
+
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const data = await deliveryStaffAPI.getMyStaffOrders();
-      setOrders(data);
+      const res = await deliveryStaffAPI.getMyStaffOrders(page, pageSize);
+      setOrders(res.content || []);
+      setTotalPages(res.totalPages || 1);
       setError(null);
     } catch (err) {
       setError("Lấy đơn hàng thất bại.");
@@ -37,7 +44,7 @@ function DeliveryStaffDashboard() {
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [page]);
 
   const handleUpdateStatus = async (order) => {
     if (updatingOrderId) return;
@@ -55,11 +62,7 @@ function DeliveryStaffDashboard() {
     setUpdatingOrderId(order.orderCode);
     try {
       await deliveryStaffAPI.updateOrderStatus(order.orderCode, nextStatus);
-      setOrders((prev) =>
-        prev.map((o) =>
-          o.orderCode === order.orderCode ? { ...o, status: nextStatus } : o
-        )
-      );
+      fetchOrders();
     } catch {
       alert("Cập nhật trạng thái thất bại.");
     } finally {
@@ -81,11 +84,7 @@ function DeliveryStaffDashboard() {
     setUpdatingOrderId(order.orderCode);
     try {
       await deliveryStaffAPI.updateOrderStatus(order.orderCode, "CANCELLED");
-      setOrders((prev) =>
-        prev.map((o) =>
-          o.orderCode === order.orderCode ? { ...o, status: "CANCELLED" } : o
-        )
-      );
+      fetchOrders();
     } catch {
       alert("Huỷ đơn thất bại.");
     } finally {
@@ -106,20 +105,25 @@ function DeliveryStaffDashboard() {
         assigned orders and update their statuses.
       </p>
 
-      {loading ? (
-        <p>Đang tải đơn hàng...</p>
-      ) : error ? (
+      {error ? (
         <p className="text-red-600">{error}</p>
       ) : orders.length === 0 ? (
         <p>Không có đơn hàng được giao.</p>
       ) : (
-        <StaffOrdersTable
-          orders={orders}
-          updatingOrderId={updatingOrderId}
-          onUpdateStatus={handleUpdateStatus}
-          onCancelOrder={handleCancelOrder}
-          onOpenDetail={openDetailModal}
-        />
+        <>
+          <StaffOrdersTable
+            orders={orders}
+            updatingOrderId={updatingOrderId}
+            onUpdateStatus={handleUpdateStatus}
+            onCancelOrder={handleCancelOrder}
+            onOpenDetail={openDetailModal}
+          />
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </>
       )}
 
       <Modal

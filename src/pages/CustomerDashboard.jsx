@@ -1,37 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import userAPI from "../api/userApi";
 import Modal from "../components/Modal";
 import CreateOrderForm from "../components/CreateOrderForm";
 import MyOrders from "../components/MyOrders";
 import OrderDetailModal from "../components/OrderDetailModal";
+import Pagination from "../components/Pagination";
+import usePaginatedData from "../hooks/usePaginatedData";
 
 function CustomerDashboard() {
   const [tab, setTab] = useState("create"); // "create" | "myOrders"
-  const [orders, setOrders] = useState([]);
-  const [loadingOrders, setLoadingOrders] = useState(false);
+  const pageSize = 10;
+
+  const {
+    data: orders,
+    page: orderPage,
+    setPage: setOrderPage,
+    totalPages: orderTotalPages,
+    loading: loadingOrders,
+    refetch: fetchOrders,
+  } = usePaginatedData(userAPI.getMyOrders, [tab === "myOrders"]);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
-
   const [selectedOrder, setSelectedOrder] = useState(null);
-
-  const fetchOrders = async () => {
-    setLoadingOrders(true);
-    try {
-      const res = await userAPI.getMyOrders();
-      setOrders(res);
-    } catch (err) {
-      console.error("Failed to fetch orders:", err);
-    } finally {
-      setLoadingOrders(false);
-    }
-  };
-
-  useEffect(() => {
-    if (tab === "myOrders") {
-      fetchOrders();
-    }
-  }, [tab]);
 
   return (
     <div className="p-8 max-w-5xl mx-auto pt-1">
@@ -73,6 +64,7 @@ function CustomerDashboard() {
               setModalMessage(message);
               setModalVisible(true);
 
+              // Nếu user đang ở tab "myOrders", thì reload data
               if (tab === "myOrders") {
                 fetchOrders();
               }
@@ -82,12 +74,19 @@ function CustomerDashboard() {
       )}
 
       {tab === "myOrders" && (
-        <MyOrders
-          orders={orders}
-          loading={loadingOrders}
-          onReload={fetchOrders}
-          onSelectOrder={setSelectedOrder}
-        />
+        <>
+          <MyOrders
+            orders={orders}
+            loading={loadingOrders}
+            onReload={fetchOrders}
+            onSelectOrder={setSelectedOrder}
+          />
+          <Pagination
+            currentPage={orderPage}
+            totalPages={orderTotalPages}
+            onPageChange={setOrderPage}
+          />
+        </>
       )}
 
       {/* Modal thông báo */}

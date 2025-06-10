@@ -28,6 +28,7 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
   return (
     <div className="flex items-center justify-center mt-4 space-x-2">
       <button
+        type="button"
         onClick={() => onPageChange(Math.max(currentPage - 1, 0))}
         disabled={currentPage === 0}
         className="px-2 py-1 border rounded cursor-pointer"
@@ -44,6 +45,7 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
       />
       <span> / {totalPages}</span>
       <button
+        type="button"
         onClick={() => onPageChange(Math.min(currentPage + 1, totalPages - 1))}
         disabled={currentPage >= totalPages - 1}
         className="px-2 py-1 border rounded cursor-pointer"

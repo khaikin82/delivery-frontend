@@ -10,13 +10,11 @@ const apiClient = axios.create({
 // Request interceptor: tự động thêm Authorization header nếu token tồn tại
 apiClient.interceptors.request.use(
   function (config) {
-    const isLogin = localStorage.getItem("isLogin");
-    if (isLogin === "true") {
-      const token = localStorage.getItem("jwtToken");
-      if (token && token !== "undefined") {
-        config.headers["Authorization"] = `Bearer ${token}`;
-      }
+    const token = localStorage.getItem("jwtToken");
+    if (token && token !== "undefined") {
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
+
     return config;
   },
   function (error) {

@@ -106,9 +106,7 @@ function MyOrders({ orders, loading, onReload, onSelectOrder }) {
       </div>
 
       {/* Table */}
-      {loading ? (
-        <p>Đang tải danh sách đơn hàng...</p>
-      ) : filteredOrders.length === 0 ? (
+      {filteredOrders.length === 0 ? (
         <p>Không tìm thấy đơn hàng nào phù hợp.</p>
       ) : (
         <OrdersTable orders={filteredOrders} onSelectOrder={onSelectOrder} />
