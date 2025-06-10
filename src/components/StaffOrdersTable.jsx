@@ -74,7 +74,7 @@ function StaffOrdersTable({
               <td className="border px-2 py-1 text-center space-x-2">
                 {canUpdate ? (
                   <button
-                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
                     onClick={() => onUpdateStatus(order)}
                     disabled={updatingOrderId === order.orderCode}
                   >
@@ -87,7 +87,7 @@ function StaffOrdersTable({
                 )}
                 {canCancel && (
                   <button
-                    className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                    className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 cursor-pointer"
                     onClick={() => onCancelOrder(order)}
                     disabled={updatingOrderId === order.orderCode}
                   >
