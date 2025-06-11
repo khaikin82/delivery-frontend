@@ -1,3 +1,4 @@
+// src/pages/CustomerDashboard.jsx
 import { useState } from "react";
 import userAPI from "../api/userApi";
 import Modal from "../components/Modal";
@@ -8,21 +9,49 @@ import Pagination from "../components/Pagination";
 import usePaginatedData from "../hooks/usePaginatedData";
 
 function CustomerDashboard() {
-  const [tab, setTab] = useState("create"); // "create" | "myOrders"
   const pageSize = 10;
+  const [tab, setTab] = useState("create"); // "create" | "myOrders"
+  const [orderPage, setOrderPage] = useState(0);
+
+  // Lọc server-side
+  const [orderFilters, setOrderFilters] = useState({
+    orderCode: "",
+    status: "",
+    dateFrom: "",
+    dateTo: "",
+  });
 
   const {
     data: orders,
-    page: orderPage,
-    setPage: setOrderPage,
     totalPages: orderTotalPages,
     loading: loadingOrders,
     refetch: fetchOrders,
-  } = usePaginatedData(userAPI.getMyOrders, [tab === "myOrders"]);
+  } = usePaginatedData(
+    (page, pageSize) =>
+      userAPI.getMyOrders({ page, pageSize, ...orderFilters }),
+    orderPage,
+    [tab === "myOrders", orderFilters],
+    pageSize
+  );
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
+
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+
+  const handleViewDetailClick = (order) => {
+    setSelectedOrder(order);
+    setDetailModalVisible(true);
+  };
+
+  const handleCreateOrderSuccess = (message) => {
+    setModalMessage(message);
+    setModalVisible(true);
+    if (tab === "myOrders") {
+      fetchOrders(); // Tự động refetch nếu đang ở tab "Đơn hàng của tôi"
+    }
+  };
 
   return (
     <div className="p-8 max-w-5xl mx-auto pt-1">
@@ -50,7 +79,10 @@ function CustomerDashboard() {
               ? "bg-green-600 text-white"
               : "bg-gray-200 text-gray-800"
           }`}
-          onClick={() => setTab("myOrders")}
+          onClick={() => {
+            setTab("myOrders");
+            setOrderPage(0);
+          }}
         >
           Đơn hàng của tôi
         </button>
@@ -59,17 +91,7 @@ function CustomerDashboard() {
       {/* Nội dung từng tab */}
       {tab === "create" && (
         <div className="bg-white p-6 rounded shadow-md">
-          <CreateOrderForm
-            onSuccess={(message) => {
-              setModalMessage(message);
-              setModalVisible(true);
-
-              // Nếu user đang ở tab "myOrders", thì reload data
-              if (tab === "myOrders") {
-                fetchOrders();
-              }
-            }}
-          />
+          <CreateOrderForm onSuccess={handleCreateOrderSuccess} />
         </div>
       )}
 
@@ -77,9 +99,12 @@ function CustomerDashboard() {
         <>
           <MyOrders
             orders={orders}
-            loading={loadingOrders}
             onReload={fetchOrders}
-            onSelectOrder={setSelectedOrder}
+            currentPage={orderPage}
+            pageSize={pageSize}
+            onSelectOrder={handleViewDetailClick}
+            filters={orderFilters}
+            onFiltersChange={setOrderFilters}
           />
           <Pagination
             currentPage={orderPage}
@@ -97,11 +122,14 @@ function CustomerDashboard() {
       />
 
       {/* Modal chi tiết order */}
-      {selectedOrder && (
+      {detailModalVisible && selectedOrder && (
         <Modal
           visible={true}
           message={<OrderDetailModal order={selectedOrder} />}
-          onClose={() => setSelectedOrder(null)}
+          onClose={() => {
+            setDetailModalVisible(false);
+            setSelectedOrder(null);
+          }}
         />
       )}
     </div>

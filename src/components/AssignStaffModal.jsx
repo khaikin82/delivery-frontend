@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import adminAPI from "../api/adminApi";
-import Pagination from "./Pagination"; // dùng lại component Pagination bạn đã có
+import Pagination from "./Pagination";
 
 function AssignStaffModal({ visible, onClose, onAssign }) {
-  const pageSize = 5; // tuỳ chỉnh số staff mỗi trang
+  const pageSize = 5;
 
   const [staffList, setStaffList] = useState([]);
   const [selectedStaff, setSelectedStaff] = useState("");
@@ -14,9 +14,16 @@ function AssignStaffModal({ visible, onClose, onAssign }) {
   const fetchStaff = async (currentPage) => {
     setLoading(true);
     try {
-      const res = await adminAPI.getDeliveryStaff(currentPage, pageSize);
-      setStaffList(res.content);
-      setTotalPages(res.totalPages);
+      // ✅ Gọi API đúng với object { page, size }
+      const res = await adminAPI.getDeliveryStaff({
+        page: currentPage,
+        size: pageSize,
+      });
+
+      // ✅ Đảm bảo res.content tồn tại
+      setStaffList(res.content || []);
+      setTotalPages(res.totalPages || 1);
+
       console.log("Staff page data:", res);
     } catch (error) {
       console.error("Error fetching staff:", error);
@@ -27,7 +34,7 @@ function AssignStaffModal({ visible, onClose, onAssign }) {
 
   useEffect(() => {
     if (visible) {
-      setPage(0); // reset page về 1 khi mở modal
+      setPage(0); // reset page khi mở lại modal
     }
   }, [visible]);
 
@@ -50,30 +57,32 @@ function AssignStaffModal({ visible, onClose, onAssign }) {
     <div className="fixed inset-0 bg-gray-300/50 transition-opacity flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded shadow-md w-96">
         <h2 className="text-xl font-semibold mb-4">Chọn nhân viên giao hàng</h2>
-        <form onSubmit={handleSubmit}>
-          {
-            <>
-              <select
-                className="border px-3 py-2 rounded w-full mb-4"
-                value={selectedStaff}
-                onChange={(e) => setSelectedStaff(e.target.value)}
-              >
-                <option value="">-- Chọn nhân viên --</option>
-                {staffList.map((staff) => (
-                  <option key={staff.username} value={staff.username}>
-                    {staff.username} - {staff.fullName}
-                  </option>
-                ))}
-              </select>
+        <form
+          onSubmit={handleSubmit}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+            }
+          }}
+        >
+          <select
+            className="border px-3 py-2 rounded w-full mb-4"
+            value={selectedStaff}
+            onChange={(e) => setSelectedStaff(e.target.value)}
+          >
+            <option value="">-- Chọn nhân viên --</option>
+            {staffList.map((staff) => (
+              <option key={staff.username} value={staff.username}>
+                {staff.username} - {staff.fullName}
+              </option>
+            ))}
+          </select>
 
-              {/* Pagination */}
-              <Pagination
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={setPage}
-              />
-            </>
-          }
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
 
           <div className="flex justify-end space-x-2 mt-4">
             <button

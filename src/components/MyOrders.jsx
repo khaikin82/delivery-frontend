@@ -1,46 +1,33 @@
-import { useState } from "react";
+// src/components/MyOrders.jsx
 import OrdersTable from "./OrdersTable";
 
-function MyOrders({ orders, loading, onReload, onSelectOrder }) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
+const ORDER_STATUS_OPTIONS = [
+  "",
+  "CREATED",
+  "ASSIGNED",
+  "PICKED_UP",
+  "IN_TRANSIT",
+  "DELIVERED",
+  "COMPLETED",
+  "CANCELLED",
+];
 
-  const ORDER_STATUS_OPTIONS = [
-    "CREATED",
-    "ASSIGNED",
-    "PICKED_UP",
-    "IN_TRANSIT",
-    "DELIVERED",
-    "COMPLETED",
-    "CANCELLED",
-  ];
-
-  // Hàm filter đơn hàng
-  const filteredOrders = orders.filter((order) => {
-    const matchesOrderCode = order.orderCode
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-
-    const matchesStatus = statusFilter ? order.status === statusFilter : true;
-
-    const orderDate = new Date(order.createdAt);
-    const matchesDateFrom = dateFrom ? orderDate >= new Date(dateFrom) : true;
-    const matchesDateTo = dateTo
-      ? orderDate <= new Date(dateTo + "T23:59:59")
-      : true;
-
-    return (
-      matchesOrderCode && matchesStatus && matchesDateFrom && matchesDateTo
-    );
-  });
-
+function MyOrders({
+  orders,
+  onReload,
+  currentPage,
+  pageSize,
+  onSelectOrder,
+  filters,
+  onFiltersChange,
+}) {
   const handleResetFilters = () => {
-    setSearchTerm("");
-    setStatusFilter("");
-    setDateFrom("");
-    setDateTo("");
+    onFiltersChange({
+      orderCode: "",
+      status: "",
+      dateFrom: "",
+      dateTo: "",
+    });
   };
 
   return (
@@ -49,43 +36,43 @@ function MyOrders({ orders, loading, onReload, onSelectOrder }) {
 
       {/* Bộ lọc */}
       <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* Tìm kiếm mã đơn */}
         <input
           type="text"
           className="border px-3 py-2 rounded w-full"
           placeholder="Tìm kiếm theo Mã đơn..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          value={filters.orderCode}
+          onChange={(e) =>
+            onFiltersChange((prev) => ({ ...prev, orderCode: e.target.value }))
+          }
         />
-
-        {/* Lọc trạng thái */}
         <select
           className="border px-3 py-2 rounded w-full"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          value={filters.status}
+          onChange={(e) =>
+            onFiltersChange((prev) => ({ ...prev, status: e.target.value }))
+          }
         >
-          <option value="">Tất cả trạng thái</option>
           {ORDER_STATUS_OPTIONS.map((status) => (
             <option key={status} value={status}>
-              {status}
+              {status === "" ? "Tất cả trạng thái" : status}
             </option>
           ))}
         </select>
-
-        {/* Lọc từ ngày */}
         <input
           type="date"
           className="border px-3 py-2 rounded w-full"
-          value={dateFrom}
-          onChange={(e) => setDateFrom(e.target.value)}
+          value={filters.dateFrom}
+          onChange={(e) =>
+            onFiltersChange((prev) => ({ ...prev, dateFrom: e.target.value }))
+          }
         />
-
-        {/* Lọc đến ngày */}
         <input
           type="date"
           className="border px-3 py-2 rounded w-full"
-          value={dateTo}
-          onChange={(e) => setDateTo(e.target.value)}
+          value={filters.dateTo}
+          onChange={(e) =>
+            onFiltersChange((prev) => ({ ...prev, dateTo: e.target.value }))
+          }
         />
       </div>
 
@@ -105,11 +92,16 @@ function MyOrders({ orders, loading, onReload, onSelectOrder }) {
         </button>
       </div>
 
-      {/* Table */}
-      {filteredOrders.length === 0 ? (
+      {/* Bảng */}
+      {orders.length === 0 ? (
         <p>Không tìm thấy đơn hàng nào phù hợp.</p>
       ) : (
-        <OrdersTable orders={filteredOrders} onSelectOrder={onSelectOrder} />
+        <OrdersTable
+          orders={orders}
+          onSelectOrder={onSelectOrder}
+          currentPage={currentPage}
+          pageSize={pageSize}
+        />
       )}
     </div>
   );

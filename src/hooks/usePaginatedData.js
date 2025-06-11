@@ -1,21 +1,25 @@
+// src/hooks/usePaginatedData.js
+
 import { useState, useEffect } from "react";
 
-function usePaginatedData(fetchFunction, dependencies = []) {
+function usePaginatedData(
+  fetchFunction,
+  page,
+  dependencies = [],
+  pageSize = 10
+) {
   const [data, setData] = useState([]);
-  const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
-
-  const pageSize = 10;
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const response = await fetchFunction(page, pageSize);
-      setData(response.content);
-      setTotalPages(response.totalPages);
+      setData(response.content || []);
+      setTotalPages(response.totalPages || 0);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching paginated data:", error);
     } finally {
       setLoading(false);
     }
@@ -27,9 +31,6 @@ function usePaginatedData(fetchFunction, dependencies = []) {
 
   return {
     data,
-    page,
-    pageSize,
-    setPage,
     totalPages,
     loading,
     refetch: fetchData,

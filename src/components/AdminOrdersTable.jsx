@@ -17,45 +17,16 @@ function AdminOrdersTable({
   onAssignOrder,
   currentPage,
   pageSize,
+  filters,
+  setFilters,
 }) {
-  const [statusFilter, setStatusFilter] = useState("");
-  const [hasDeliveryStaffFilter, setHasDeliveryStaffFilter] = useState("");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
-
-  // Lọc đơn hàng theo các filter đã chọn
-  const filteredOrders = orders.filter((order) => {
-    // Lọc trạng thái
-    const matchesStatus = statusFilter ? order.status === statusFilter : true;
-
-    // Lọc có người giao hay chưa
-    const matchesHasDeliveryStaff =
-      hasDeliveryStaffFilter === ""
-        ? true
-        : hasDeliveryStaffFilter === "yes"
-        ? Boolean(order.deliveryStaffUsername)
-        : !order.deliveryStaffUsername;
-
-    // Lọc theo khoảng ngày tạo đơn
-    const orderDate = new Date(order.createdAt);
-    const matchesDateFrom = dateFrom ? orderDate >= new Date(dateFrom) : true;
-    const matchesDateTo = dateTo
-      ? orderDate <= new Date(dateTo + "T23:59:59")
-      : true;
-
-    return (
-      matchesStatus &&
-      matchesHasDeliveryStaff &&
-      matchesDateFrom &&
-      matchesDateTo
-    );
-  });
-
   const handleResetFilters = () => {
-    setStatusFilter("");
-    setHasDeliveryStaffFilter("");
-    setDateFrom("");
-    setDateTo("");
+    setFilters({
+      status: "",
+      hasDeliveryStaff: "",
+      dateFrom: "",
+      dateTo: "",
+    });
   };
 
   return (
@@ -65,8 +36,10 @@ function AdminOrdersTable({
         {/* Lọc trạng thái */}
         <select
           className="border px-3 py-2 rounded w-full"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          value={filters.status}
+          onChange={(e) =>
+            setFilters((prev) => ({ ...prev, status: e.target.value }))
+          }
         >
           {ORDER_STATUS_OPTIONS.map((status) => (
             <option key={status} value={status}>
@@ -78,8 +51,13 @@ function AdminOrdersTable({
         {/* Lọc có người giao hay chưa */}
         <select
           className="border px-3 py-2 rounded w-full"
-          value={hasDeliveryStaffFilter}
-          onChange={(e) => setHasDeliveryStaffFilter(e.target.value)}
+          value={filters.hasDeliveryStaff}
+          onChange={(e) =>
+            setFilters((prev) => ({
+              ...prev,
+              hasDeliveryStaff: e.target.value,
+            }))
+          }
         >
           <option value="">Tất cả đơn</option>
           <option value="yes">Có người giao</option>
@@ -90,16 +68,26 @@ function AdminOrdersTable({
         <input
           type="date"
           className="border px-3 py-2 rounded w-full"
-          value={dateFrom}
-          onChange={(e) => setDateFrom(e.target.value)}
+          value={filters.dateFrom}
+          onChange={(e) =>
+            setFilters((prev) => ({
+              ...prev,
+              dateFrom: e.target.value,
+            }))
+          }
         />
 
         {/* Lọc đến ngày */}
         <input
           type="date"
           className="border px-3 py-2 rounded w-full"
-          value={dateTo}
-          onChange={(e) => setDateTo(e.target.value)}
+          value={filters.dateTo}
+          onChange={(e) =>
+            setFilters((prev) => ({
+              ...prev,
+              dateTo: e.target.value,
+            }))
+          }
         />
       </div>
 
@@ -131,7 +119,7 @@ function AdminOrdersTable({
             </tr>
           </thead>
           <tbody>
-            {filteredOrders.length === 0 ? (
+            {orders.length === 0 ? (
               <tr>
                 <td
                   colSpan={10}
@@ -141,7 +129,7 @@ function AdminOrdersTable({
                 </td>
               </tr>
             ) : (
-              filteredOrders.map((order, index) => {
+              orders.map((order, index) => {
                 const rowClass = index % 2 === 0 ? "bg-white" : "bg-blue-50";
                 const stt = currentPage * pageSize + index + 1;
 
