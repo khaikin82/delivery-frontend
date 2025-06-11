@@ -6,6 +6,11 @@ const createOrder = (orderData) => {
   return apiClient.post(url, orderData);
 };
 
+const findOrder = (orderCode) => {
+  const url = `/v1/orders/code/${orderCode}`;
+  return apiClient.get(url);
+};
+
 // const getMyOrders = (page = 0, size = 10) => {
 //   const url = `/v1/orders/my?page=${page}&size=${size}`;
 //   return apiClient.get(url);
@@ -19,6 +24,7 @@ const getMyOrders = (params) => {
 const userAPI = {
   createOrder,
   getMyOrders,
+  findOrder,
 };
 
 export default userAPI;

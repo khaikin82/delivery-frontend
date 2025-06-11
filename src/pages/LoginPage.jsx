@@ -1,10 +1,12 @@
-// src/pages/LoginPage.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import authAPI from "../api/authApi";
+import { useAuth } from "../context/AuthContext";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth(); // ✅ gọi 1 lần duy nhất
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,7 +27,8 @@ function LoginPage() {
         return;
       }
 
-      // Điều hướng theo role của user
+      login(user); // ✅ set vào context
+
       switch (user.role) {
         case "ADMIN":
           navigate("/admin");
@@ -66,7 +69,7 @@ function LoginPage() {
         <div className="mb-4">
           <label className="block mb-1">Username</label>
           <input
-            type="username"
+            type="text"
             className="w-full border border-gray-300 px-3 py-2 rounded"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
